@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>あの場所の今 — ストリートビュー同窓会</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-title">
+        <span class="header-icon">🗺️</span>
+        <div>
+          <h1>あの場所の今</h1>
+          <p class="header-sub">ストリートビュー同窓会</p>
+        </div>
+      </div>
+      <p class="header-desc">昔住んでいた場所、母校、新婚旅行の地…あの頃の思い出をもう一度。</p>
+    </div>
+  </header>
+
+  <!-- メインレイアウト -->
+  <main class="app-main">
+
+    <!-- 左パネル：検索 & お気に入り -->
+    <aside class="side-panel">
+
+      <!-- 検索フォーム -->
+      <section class="card search-card">
+        <h2 class="card-title">📍 場所を検索</h2>
+
+        <div class="form-group">
+          <label for="search-input">住所・施設名・キーワード</label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="例：東京タワー、渋谷駅、札幌市北区…"
+              autocomplete="off"
+            />
+            <button id="search-btn" class="btn btn-primary" title="検索">
+              🔍
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="year-input">当時の西暦（任意）</label>
+          <input
+            type="number"
+            id="year-input"
+            placeholder="例：1995"
+            min="1900"
+            max="2099"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="memo-input">思い出メモ（任意）</label>
+          <textarea
+            id="memo-input"
+            rows="3"
+            placeholder="例：新婚旅行で訪れた思い出の場所。桜が満開だった。"
+          ></textarea>
+        </div>
+
+        <button id="add-favorite-btn" class="btn btn-secondary" disabled>
+          ♡ お気に入りに追加
+        </button>
+      </section>
+
+      <!-- お気に入りリスト -->
+      <section class="card favorites-card">
+        <div class="favorites-header">
+          <h2 class="card-title">💛 お気に入りリスト</h2>
+          <button id="clear-all-btn" class="btn btn-ghost btn-sm" title="すべて削除">🗑️ 全削除</button>
+        </div>
+        <div id="favorites-list">
+          <p class="empty-msg">まだお気に入りはありません。<br>場所を検索して追加してみましょう！</p>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- 右エリア：地図 & ストリートビュー -->
+    <div class="view-area">
+
+      <!-- 現在地情報バー -->
+      <div class="location-bar" id="location-bar">
+        <span class="location-icon">📌</span>
+        <span id="current-address" class="location-address">住所を入力して検索してください</span>
+      </div>
+
+      <!-- 地図 -->
+      <div class="map-container">
+        <div id="map"></div>
+        <div id="map-placeholder" class="view-placeholder">
+          <span>🗺️</span>
+          <p>地図がここに表示されます</p>
+        </div>
+      </div>
+
+      <!-- ストリートビュー -->
+      <div class="sv-container">
+        <div class="sv-label">🔭 ストリートビュー（現在の様子）</div>
+        <div id="street-view"></div>
+        <div id="street-view-placeholder" class="view-placeholder">
+          <span>🏙️</span>
+          <p>ストリートビューがここに表示されます</p>
+          <small>場所を検索するとストリートビューが表示されます</small>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="app-footer">
+    <p>© 2024 あの場所の今 | Powered by Google Maps Platform</p>
+  </footer>
+
+  <!-- ① config.js を先に読み込む（APIキーを定義） -->
+  <script src="config.js"></script>
+
+  <!-- ② Google Maps API を動的に読み込む -->
+  <script>
+    (function () {
+      if (typeof CONFIG === 'undefined' || !CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY === 'YOUR_API_KEY_HERE') {
+        document.body.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#f0f4f8;">
+            <div style="background:white;padding:2rem 3rem;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);max-width:480px;text-align:center;">
+              <p style="font-size:3rem;margin:0 0 1rem">⚠️</p>
+              <h2 style="color:#e53e3e;margin:0 0 1rem">APIキーが設定されていません</h2>
+              <p style="color:#4a5568;line-height:1.7">
+                <code>config.example.js</code> をコピーして<br>
+                <code>config.js</code> にリネームし、<br>
+                Google Maps APIキーを入力してください。
+              </p>
+              <p style="margin-top:1rem;font-size:0.85rem;color:#718096">
+                詳しくは <strong>README.md</strong> を参照してください。
+              </p>
+            </div>
+          </div>`;
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'https://maps.googleapis.com/maps/api/js?key=' +
+        CONFIG.GOOGLE_MAPS_API_KEY +
+        '&libraries=places&callback=initApp&language=ja';
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    })();
+  </script>
+
+  <!-- ③ アプリ本体 -->
+  <script src="app.js"></script>
+
+</body>
+</html>
